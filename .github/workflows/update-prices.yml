@@ -26,5 +26,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: b236a9d1a7f596ffec58c1dc006683ee
         run: |
-          gh gist edit $GIST_ID -f prices.csv < dist/prices.csv
-          gh gist edit $GIST_ID -f prices.json < dist/prices.json
+          jq -n \
+            --arg csv "$(cat dist/prices.csv)" \
+            --arg json "$(cat dist/prices.json)" \
+            '{"files": {"prices.csv": {"content": $csv}, "prices.json": {"content": $json}}}' \
+          | gh api --method PATCH "/gists/$GIST_ID" --input -
