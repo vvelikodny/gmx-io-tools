@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GMX IO Tools — GM & GLV Token Prices</title>
+  <title>GMX Tools — GM & GLV Token Prices</title>
   <meta name="description" content="Live GM and GLV token prices from GMX V2 on Arbitrum and Avalanche. Updated every 5 minutes. Free API for Google Sheets.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>GMX IO Tools</h1>
+      <h1>GMX Tools</h1>
       <p>Live GM & GLV token prices from GMX V2, updated every 5 minutes</p>
     </header>
 
@@ -54,18 +54,18 @@
       <div class="formula-cards">
         <div class="card">
           <h3>All prices (Arbitrum + Avalanche)</h3>
-          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")</code></pre>
-          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv&quot;)')">Copy</button>
+          <pre><code>=IMPORTDATA("https://gmx-tools.github.io/v1/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://gmx-tools.github.io/v1/prices.csv&quot;)')">Copy</button>
         </div>
         <div class="card">
           <h3>Arbitrum only</h3>
-          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")</code></pre>
-          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv&quot;)')">Copy</button>
+          <pre><code>=IMPORTDATA("https://gmx-tools.github.io/v1/arbitrum/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://gmx-tools.github.io/v1/arbitrum/prices.csv&quot;)')">Copy</button>
         </div>
         <div class="card">
           <h3>Avalanche only</h3>
-          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")</code></pre>
-          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv&quot;)')">Copy</button>
+          <pre><code>=IMPORTDATA("https://gmx-tools.github.io/v1/avalanche/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://gmx-tools.github.io/v1/avalanche/prices.csv&quot;)')">Copy</button>
         </div>
       </div>
     </section>
@@ -84,7 +84,7 @@
     </section>
 
     <footer>
-      <a href="https://github.com/vvelikodny/gmx-io-tools">GitHub</a>
+      <a href="https://github.com/gmx-tools/gmx-tools.github.io">GitHub</a>
     </footer>
   </div>
 

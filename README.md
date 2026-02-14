@@ -1,4 +1,4 @@
-# GMX IO Tools
+# GMX Tools
 
 Live GM and GLV token prices from GMX V2. Updated every 5 minutes via GitHub Actions and published to GitHub Pages.
 
@@ -6,13 +6,13 @@ Live GM and GLV token prices from GMX V2. Updated every 5 minutes via GitHub Act
 
 | Format | URL |
 |--------|-----|
-| Landing page | https://vvelikodny.github.io/gmx-io-tools/ |
-| All prices (JSON) | https://vvelikodny.github.io/gmx-io-tools/v1/prices.json |
-| All prices (CSV) | https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv |
-| Arbitrum (JSON) | https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.json |
-| Arbitrum (CSV) | https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv |
-| Avalanche (JSON) | https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.json |
-| Avalanche (CSV) | https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv |
+| Landing page | https://gmx-tools.github.io/ |
+| All prices (JSON) | https://gmx-tools.github.io/v1/prices.json |
+| All prices (CSV) | https://gmx-tools.github.io/v1/prices.csv |
+| Arbitrum (JSON) | https://gmx-tools.github.io/v1/arbitrum/prices.json |
+| Arbitrum (CSV) | https://gmx-tools.github.io/v1/arbitrum/prices.csv |
+| Avalanche (JSON) | https://gmx-tools.github.io/v1/avalanche/prices.json |
+| Avalanche (CSV) | https://gmx-tools.github.io/v1/avalanche/prices.csv |
 
 ## Supported Networks
 
@@ -31,14 +31,14 @@ No scripts, no permissions, no setup — just one formula.
 4. Press Enter — done!
 
 ```
-=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")
+=IMPORTDATA("https://gmx-tools.github.io/v1/prices.csv")
 ```
 
 For a specific network:
 
 ```
-=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")
-=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")
+=IMPORTDATA("https://gmx-tools.github.io/v1/arbitrum/prices.csv")
+=IMPORTDATA("https://gmx-tools.github.io/v1/avalanche/prices.csv")
 ```
 
 ## CLI Usage
@@ -90,8 +90,8 @@ arbitrum,glv,"GLV [WETH-USDC]",0x...,1.23,100000000
 ## Development
 
 ```bash
-git clone https://github.com/vvelikodny/gmx-io-tools.git
-cd gmx-io-tools
+git clone https://github.com/gmx-tools/gmx-tools.github.io.git
+cd gmx-tools.github.io
 npm install
 cp .env.example .env
 npm start
