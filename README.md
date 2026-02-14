@@ -21,11 +21,14 @@ Live GM and GLV token prices from GMX V2. Updated every 5 minutes via GitHub Act
 | Arbitrum | All markets | All vaults |
 | Avalanche | All markets | All vaults |
 
-## Google Sheets Integration
+## Google Sheets
 
-### Import CSV directly
+No scripts, no permissions, no setup — just one formula.
 
-Paste this formula into any cell:
+1. Open Google Sheets
+2. Click on any empty cell
+3. Paste the formula
+4. Press Enter — done!
 
 ```
 =IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")
@@ -35,32 +38,7 @@ For a specific network:
 
 ```
 =IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")
-```
-
-### Google Apps Script (JSON)
-
-For more control, use Apps Script (`Extensions > Apps Script`):
-
-```javascript
-function getGmPrices() {
-  var url = "https://vvelikodny.github.io/gmx-io-tools/v1/prices.json";
-  var response = UrlFetchApp.fetch(url);
-  var data = JSON.parse(response.getContentText());
-  var rows = [["Network", "Type", "Name", "Price", "Pool Value"]];
-
-  for (var network in data.networks) {
-    var nd = data.networks[network];
-    nd.gm.forEach(function(t) {
-      rows.push([network, "GM", t.name, t.price, t.poolValue]);
-    });
-    nd.glv.forEach(function(t) {
-      rows.push([network, "GLV", t.name, t.price, t.tvl]);
-    });
-  }
-
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
-}
+=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")
 ```
 
 ## CLI Usage

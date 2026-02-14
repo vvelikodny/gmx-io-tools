@@ -29,18 +29,44 @@
 
     <!-- Google Sheets Integration -->
     <section>
-      <h2>Google Sheets Integration</h2>
-      <div class="card">
-        <h3>Import all prices</h3>
-        <p>Paste this formula into any cell in Google Sheets:</p>
-        <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")</code></pre>
-        <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv&quot;)')">Copy formula</button>
+      <h2>Google Sheets</h2>
+      <p class="section-subtitle">No scripts, no permissions, no setup — just one formula.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Open Google Sheets</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Click on any empty cell</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Paste the formula below</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">Press Enter — done!</div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Import by network</h3>
-        <p>For a specific network only:</p>
-        <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")
-=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")</code></pre>
+
+      <div class="formula-cards">
+        <div class="card">
+          <h3>All prices (Arbitrum + Avalanche)</h3>
+          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv&quot;)')">Copy</button>
+        </div>
+        <div class="card">
+          <h3>Arbitrum only</h3>
+          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv&quot;)')">Copy</button>
+        </div>
+        <div class="card">
+          <h3>Avalanche only</h3>
+          <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")</code></pre>
+          <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv&quot;)')">Copy</button>
+        </div>
       </div>
     </section>
 

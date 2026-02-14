@@ -180,6 +180,53 @@ tr:hover td {
   color: var(--text-secondary);
 }
 
+/* Section subtitle */
+.section-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Formula cards */
+.formula-cards {
+  display: grid;
+  gap: 12px;
+}
+
 /* Cards */
 .card {
   background: var(--card-bg);
