@@ -1,9 +1,10 @@
 {
-  "name": "gm-price",
-  "version": "1.0.0",
+  "name": "gmx-io-tools",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
+    "build": "tsx src/publish.ts",
     "publish": "tsx src/publish.ts"
   },
   "dependencies": {

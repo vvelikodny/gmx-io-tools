@@ -1,13 +1,25 @@
-name: Update GM Prices
+name: Update GM/GLV Prices
 
 on:
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -21,13 +33,11 @@ jobs:
       - name: Fetch prices
         run: npx tsx src/publish.ts
 
-      - name: Update Gist
-        env:
-          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: b236a9d1a7f596ffec58c1dc006683ee
-        run: |
-          jq -n \
-            --arg csv "$(cat dist/prices.csv)" \
-            --arg json "$(cat dist/prices.json)" \
-            '{"files": {"prices.csv": {"content": $csv}, "prices.json": {"content": $json}}}' \
-          | gh api --method PATCH "/gists/$GIST_ID" --input -
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

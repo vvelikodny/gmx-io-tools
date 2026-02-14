@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMX IO Tools — GM & GLV Token Prices</title>
+  <meta name="description" content="Live GM and GLV token prices from GMX V2 on Arbitrum and Avalanche. Updated every 5 minutes. Free API for Google Sheets.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>GMX IO Tools</h1>
+      <p>Live GM & GLV token prices from GMX V2, updated every 5 minutes</p>
+    </header>
+
+    <div id="updated" class="updated"></div>
+
+    <!-- Network Tabs -->
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-network="arbitrum">Arbitrum</button>
+      <button class="tab" data-network="avalanche">Avalanche</button>
+    </div>
+
+    <!-- Price Tables -->
+    <div id="content">
+      <div class="loading"><span class="spinner"></span>Loading prices...</div>
+    </div>
+
+    <!-- Google Sheets Integration -->
+    <section>
+      <h2>Google Sheets Integration</h2>
+      <div class="card">
+        <h3>Import all prices</h3>
+        <p>Paste this formula into any cell in Google Sheets:</p>
+        <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv")</code></pre>
+        <button class="copy-btn" onclick="copyText('=IMPORTDATA(&quot;https://vvelikodny.github.io/gmx-io-tools/v1/prices.csv&quot;)')">Copy formula</button>
+      </div>
+      <div class="card">
+        <h3>Import by network</h3>
+        <p>For a specific network only:</p>
+        <pre><code>=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/arbitrum/prices.csv")
+=IMPORTDATA("https://vvelikodny.github.io/gmx-io-tools/v1/avalanche/prices.csv")</code></pre>
+      </div>
+    </section>
+
+    <!-- Downloads -->
+    <section>
+      <h2>Download Data</h2>
+      <div class="downloads">
+        <a class="dl-link" href="v1/prices.json">JSON (All)</a>
+        <a class="dl-link" href="v1/prices.csv">CSV (All)</a>
+        <a class="dl-link" href="v1/arbitrum/prices.json">JSON (Arbitrum)</a>
+        <a class="dl-link" href="v1/arbitrum/prices.csv">CSV (Arbitrum)</a>
+        <a class="dl-link" href="v1/avalanche/prices.json">JSON (Avalanche)</a>
+        <a class="dl-link" href="v1/avalanche/prices.csv">CSV (Avalanche)</a>
+      </div>
+    </section>
+
+    <footer>
+      <a href="https://github.com/vvelikodny/gmx-io-tools">GitHub</a>
+    </footer>
+  </div>
+
+  <script>
+    const BASE = 'v1/prices.json';
+    let data = null;
+    let activeNetwork = 'arbitrum';
+
+    async function loadData() {
+      try {
+        const res = await fetch(BASE);
+        data = await res.json();
+        render();
+      } catch (e) {
+        document.getElementById('content').innerHTML =
+          '<p style="text-align:center;color:var(--text-secondary);padding:40px">Failed to load prices. Please try again later.</p>';
+      }
+    }
+
+    function fmt(n) {
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+    }
+
+    function fmtPool(n) {
+      return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+
+    function addr(s) {
+      return s.slice(0, 6) + '...' + s.slice(-4);
+    }
+
+    function renderTable(items, type) {
+      if (!items || items.length === 0) return '';
+      const isGlv = type === 'glv';
+      const label = isGlv ? 'GLV Vaults' : 'GM Tokens';
+      const poolLabel = isGlv ? 'TVL' : 'Pool Value';
+      const poolKey = isGlv ? 'tvl' : 'poolValue';
+
+      let html = '<h2>' + label + ' <span class="badge">' + items.length + '</span></h2>';
+      html += '<div class="table-wrap"><table><thead><tr>';
+      html += '<th>Name</th><th>Address</th><th>Price</th><th>' + poolLabel + '</th>';
+      html += '</tr></thead><tbody>';
+
+      for (const item of items) {
+        html += '<tr>';
+        html += '<td>' + item.name + '</td>';
+        html += '<td class="address">' + addr(item.address) + '</td>';
+        html += '<td class="price">' + fmt(item.price) + '</td>';
+        html += '<td class="pool-value">' + fmtPool(item[poolKey]) + '</td>';
+        html += '</tr>';
+      }
+
+      html += '</tbody></table></div>';
+      return html;
+    }
+
+    function render() {
+      if (!data) return;
+
+      document.getElementById('updated').textContent = 'Last updated: ' + new Date(data.updated).toLocaleString();
+
+      const nd = data.networks[activeNetwork];
+      if (!nd) {
+        document.getElementById('content').innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary)">No data for this network.</p>';
+        return;
+      }
+
+      let html = '';
+      html += renderTable(nd.gm, 'gm');
+      html += renderTable(nd.glv, 'glv');
+      document.getElementById('content').innerHTML = html;
+    }
+
+    // Tab switching
+    document.getElementById('tabs').addEventListener('click', function(e) {
+      const tab = e.target.closest('.tab');
+      if (!tab) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeNetwork = tab.dataset.network;
+      render();
+    });
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy formula', 1500);
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
