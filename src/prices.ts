@@ -12,7 +12,28 @@ const MAX_PNL_FACTOR_FOR_TRADERS_KEY = keccak256(
   encodeAbiParameters([{ type: "string" }], ["MAX_PNL_FACTOR_FOR_TRADERS"])
 );
 
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 5;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = MAX_RETRIES
+): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === retries) throw err;
+      await sleep(RETRY_DELAY_MS * attempt);
+    }
+  }
+  throw new Error("unreachable");
+}
 
 async function processBatches<T, R>(
   items: T[],
@@ -26,6 +47,8 @@ async function processBatches<T, R>(
     for (const r of batchResults) {
       if (r !== undefined) results.push(r);
     }
+    // Small delay between batches to avoid rate limiting
+    if (i + batchSize < items.length) await sleep(200);
   }
   return results;
 }
@@ -74,25 +97,27 @@ export async function fetchGmPrices(
     const shortP = tickers[m.shortToken.toLowerCase()];
 
     try {
-      const [gmPrice, poolInfo] = await client.readContract({
-        address: network.contracts.syntheticsReader,
-        abi: SyntheticsReaderAbi,
-        functionName: "getMarketTokenPrice",
-        args: [
-          network.contracts.dataStore,
-          {
-            marketToken: m.marketToken as Address,
-            indexToken: m.indexToken as Address,
-            longToken: m.longToken as Address,
-            shortToken: m.shortToken as Address,
-          },
-          { min: BigInt(indexP.minPrice), max: BigInt(indexP.maxPrice) },
-          { min: BigInt(longP.minPrice), max: BigInt(longP.maxPrice) },
-          { min: BigInt(shortP.minPrice), max: BigInt(shortP.maxPrice) },
-          MAX_PNL_FACTOR_FOR_TRADERS_KEY,
-          false,
-        ],
-      });
+      const [gmPrice, poolInfo] = await withRetry(() =>
+        client.readContract({
+          address: network.contracts.syntheticsReader,
+          abi: SyntheticsReaderAbi,
+          functionName: "getMarketTokenPrice",
+          args: [
+            network.contracts.dataStore,
+            {
+              marketToken: m.marketToken as Address,
+              indexToken: m.indexToken as Address,
+              longToken: m.longToken as Address,
+              shortToken: m.shortToken as Address,
+            },
+            { min: BigInt(indexP.minPrice), max: BigInt(indexP.maxPrice) },
+            { min: BigInt(longP.minPrice), max: BigInt(longP.maxPrice) },
+            { min: BigInt(shortP.minPrice), max: BigInt(shortP.maxPrice) },
+            MAX_PNL_FACTOR_FOR_TRADERS_KEY,
+            false,
+          ],
+        })
+      );
 
       return {
         address: m.marketToken,
@@ -182,20 +207,22 @@ export async function fetchGlvPrices(
       if (marketAddresses.length === 0) return;
 
       try {
-        const result = await client.readContract({
-          address: network.contracts.glvReader,
-          abi: GlvReaderAbi,
-          functionName: "getGlvTokenPrice",
-          args: [
-            network.contracts.dataStore,
-            marketAddresses,
-            indexTokenPrices,
-            { min: BigInt(longP.minPrice), max: BigInt(longP.maxPrice) },
-            { min: BigInt(shortP.minPrice), max: BigInt(shortP.maxPrice) },
-            info.glv.glvToken,
-            false,
-          ],
-        });
+        const result = await withRetry(() =>
+          client.readContract({
+            address: network.contracts.glvReader,
+            abi: GlvReaderAbi,
+            functionName: "getGlvTokenPrice",
+            args: [
+              network.contracts.dataStore,
+              marketAddresses,
+              indexTokenPrices,
+              { min: BigInt(longP.minPrice), max: BigInt(longP.maxPrice) },
+              { min: BigInt(shortP.minPrice), max: BigInt(shortP.maxPrice) },
+              info.glv.glvToken,
+              false,
+            ],
+          })
+        );
 
         const [glvPrice, glvSupply, glvValue] = result as readonly [bigint, bigint, bigint];
 
