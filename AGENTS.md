@@ -28,35 +28,25 @@ dist/             Generated output (gitignored)
 ## Build / Run / Test Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Run CLI (prints prices to stdout)
-npm start                  # all networks
-npm start arbitrum         # single network
-npm start avalanche        # single network
-
-# Build static output to dist/
-npm run build
-
-# Type-check without emitting (no tsc build step in scripts)
-npx tsc --noEmit
-
-# Run a single source file directly
-npx tsx src/<file>.ts
+npm install                # Install dependencies
+npm start                  # Run CLI — all networks
+npm start arbitrum         # Run CLI — single network
+npm start avalanche        # Run CLI — single network
+npm run build              # Build static output to dist/
+npx tsc --noEmit           # Type-check only (no emit)
+npx tsx src/<file>.ts      # Run a single source file directly
 ```
 
-**No test framework is configured.** There are no test files, no test runner, and no
-`test` script in package.json. If adding tests, use `vitest` (compatible with the
-existing ESM + TypeScript setup).
+**No test framework is configured.** No test files, runner, or `test` script exist.
+If adding tests, use `vitest` (compatible with the ESM + TypeScript setup).
 
-**No linter or formatter is configured.** There is no ESLint, Prettier, or
-EditorConfig. Follow the conventions described below to stay consistent.
+**No linter or formatter is configured.** No ESLint, Prettier, or EditorConfig.
+Follow the conventions below to stay consistent.
 
 ## Environment Variables
 
 Copy `.env.example` to `.env`. Both variables have fallback defaults in `config.ts`,
-so the `.env` file is optional for basic usage.
+so `.env` is optional for basic usage.
 
 ```
 ARBITRUM_RPC_URL=https://arb1.arbitrum.io/rpc
@@ -72,29 +62,27 @@ GitHub Actions workflow (`.github/workflows/update-prices.yml`):
 
 ## Code Style Guidelines
 
-### Module System
+### Module System & Imports
 
-- ESM throughout (`"type": "module"` in package.json)
+- ESM throughout (`"type": "module"` in package.json).
 - Use `.js` extensions in all local imports (required by ESM resolution):
   ```ts
   import { NETWORKS } from "./config.js";
   ```
-
-### Imports
-
-- Group imports: third-party packages first, then local modules
+- Group imports: side-effect first, then third-party, then local modules.
 - Use `import type` for type-only imports:
   ```ts
   import type { OracleMarket, Ticker } from "./types.js";
   ```
-- Inline type imports with `type` keyword when mixing values and types:
+- Inline `type` keyword when mixing values and types in one import:
   ```ts
   import { type Address, type PublicClient, encodeAbiParameters } from "viem";
   ```
-- Side-effect imports at the very top of entry points:
+- Use `node:` prefix for built-in modules:
   ```ts
-  import "dotenv/config";
+  import { mkdirSync, writeFileSync } from "node:fs";
   ```
+- Use native `fetch()` (Node.js 22 built-in) — no axios or node-fetch.
 
 ### Formatting
 
@@ -104,7 +92,7 @@ GitHub Actions workflow (`.github/workflows/update-prices.yml`):
 - Trailing commas in multi-line arrays/objects
 - No trailing whitespace
 - Files end with a single newline
-- ~80-100 char line width (soft limit, no enforced formatter)
+- ~80-100 char line width (soft limit)
 
 ### Naming Conventions
 
@@ -124,12 +112,12 @@ GitHub Actions workflow (`.github/workflows/update-prices.yml`):
 - All shared interfaces live in `types.ts`
 - Use `Record<string, T>` for map/dictionary types
 - Use viem types (`Address`, `PublicClient`, `Chain`) for Ethereum values
-- Use native `BigInt` literals (`10n`, `0n`) — never `BigInt()` constructor for literals
+- Use native `BigInt` literals (`10n`, `0n`) — never `BigInt()` constructor
 - Prefer explicit return types on exported functions
 
 ### Error Handling
 
-- Entry points use the `main().catch()` pattern:
+- Entry points use `main().catch()`:
   ```ts
   main().catch((err) => {
     console.error("Error:", err.message || err);
@@ -145,30 +133,21 @@ GitHub Actions workflow (`.github/workflows/update-prices.yml`):
     return undefined;
   }
   ```
-- Use the `withRetry<T>()` pattern for RPC calls (exponential backoff, 3 retries)
+- Use the `withRetry<T>()` helper for RPC calls (exponential backoff, 3 retries)
 
 ### Async Patterns
 
 - `async/await` everywhere — no raw `.then()` chains
 - `Promise.all()` for independent parallel work (e.g., fetching markets + tickers)
-- `processBatches()` for rate-limited sequential batch processing
-- Small `sleep(200)` between RPC batches to avoid rate limiting on public endpoints
+- `processBatches()` for rate-limited sequential batch processing (BATCH_SIZE=5)
+- Small `sleep(200)` between RPC batches to avoid rate limiting
 
 ### Output / Data Format
 
-- JSON files: 2-space indentation + trailing newline (`JSON.stringify(data, null, 2) + "\n"`)
-- CSV files: manual string construction, trailing newline, no external CSV library
+- JSON: 2-space indentation + trailing newline (`JSON.stringify(data, null, 2) + "\n"`)
+- CSV: manual string construction, trailing newline, no external CSV library
 - Versioned API paths (`/v1/`) for backward compatibility
-- File I/O uses synchronous Node.js `fs` functions (`writeFileSync`, `mkdirSync`)
-
-### Node.js APIs
-
-- Use `node:` prefix for built-in modules:
-  ```ts
-  import { mkdirSync, writeFileSync } from "node:fs";
-  import { join } from "node:path";
-  ```
-- Use native `fetch()` (Node.js 22 built-in) — no axios or node-fetch
+- File I/O uses synchronous `fs` functions (`writeFileSync`, `mkdirSync`)
 
 ### Console Output
 
@@ -182,5 +161,5 @@ GitHub Actions workflow (`.github/workflows/update-prices.yml`):
 - **GM Tokens:** GMX V2 market pool tokens — priced via `SyntheticsReader.getMarketTokenPrice`
 - **GLV Vaults:** GMX Liquidity Vault tokens — priced via `GlvReader.getGlvTokenPrice`
 - **Oracle prices** use 30-decimal precision (`bigintToFloat(value, 30)`)
-- **Whitelist:** Only established assets are included (defined in `WHITELISTED_SYMBOLS` in `config.ts`). Meme tokens are excluded.
+- **Whitelist:** Only established assets included (`WHITELISTED_SYMBOLS` in `config.ts`). Meme tokens excluded.
 - **Networks:** Arbitrum and Avalanche. Config includes chain, RPC URL, API URL, and contract addresses.
